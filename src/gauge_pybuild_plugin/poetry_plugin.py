@@ -11,13 +11,11 @@ Usage:
     poetry gauge install <plugin>
 """
 
-from typing import Any, Dict, Optional
 try:
-    from cleo.commands.command import Command
     from cleo.helpers import argument, option
-    from poetry.plugins.application_plugin import ApplicationPlugin
     from poetry.console.application import Application
     from poetry.console.commands.command import Command as PoetryCommand
+    from poetry.plugins.application_plugin import ApplicationPlugin
     POETRY_AVAILABLE = True
 except ImportError:
     POETRY_AVAILABLE = False
@@ -27,19 +25,19 @@ except ImportError:
     class PoetryCommand:
         pass
 
-from .core import GaugePlugin, GaugeConfig
+from .core import GaugePlugin
 
 
 class GaugeRunCommand(PoetryCommand):
     """Command to run Gauge specs through Poetry."""
-    
+
     name = "gauge run"
     description = "Run Gauge specifications"
-    
+
     arguments = [
         argument("specs", "Specification files to run", optional=True, multiple=True)
     ]
-    
+
     options = [
         option("specs-dir", None, "Gauge specs directory path", flag=False),
         option("tags", None, "Filter specs by tags expression", flag=False),
@@ -50,13 +48,13 @@ class GaugeRunCommand(PoetryCommand):
         option("project-dir", None, "Path to gauge project directory", flag=False),
         option("gauge-root", None, "Path to gauge installation root", flag=False),
     ]
-    
+
     def handle(self) -> int:
         """Handle the gauge run command."""
         try:
             # Build configuration from options
             config_dict = {}
-            
+
             if self.option("specs-dir"):
                 config_dict["specs_dir"] = self.option("specs-dir")
             if self.option("tags"):
@@ -73,24 +71,24 @@ class GaugeRunCommand(PoetryCommand):
                 config_dict["project_dir"] = self.option("project-dir")
             if self.option("gauge-root"):
                 config_dict["gauge_root"] = self.option("gauge-root")
-            
+
             # Create and configure plugin
             plugin = GaugePlugin()
             task = plugin.create_task(config_dict)
-            
+
             # Get spec files if provided
             specs = self.argument("specs") if self.argument("specs") else None
-            
+
             # Run the task
             success = task.run(specs)
-            
+
             if success:
                 self.line("<info>Gauge execution completed successfully</info>")
                 return 0
             else:
                 self.line("<error>Gauge execution failed</error>")
                 return 1
-                
+
         except Exception as e:
             self.line(f"<error>Error running Gauge: {e}</error>")
             return 1
@@ -98,43 +96,43 @@ class GaugeRunCommand(PoetryCommand):
 
 class GaugeValidateCommand(PoetryCommand):
     """Command to validate Gauge project through Poetry."""
-    
+
     name = "gauge validate"
     description = "Validate Gauge project"
-    
+
     options = [
         option("specs-dir", None, "Gauge specs directory path", flag=False),
         option("project-dir", None, "Path to gauge project directory", flag=False),
         option("gauge-root", None, "Path to gauge installation root", flag=False),
     ]
-    
+
     def handle(self) -> int:
         """Handle the gauge validate command."""
         try:
             # Build configuration from options
             config_dict = {}
-            
+
             if self.option("specs-dir"):
                 config_dict["specs_dir"] = self.option("specs-dir")
             if self.option("project-dir"):
                 config_dict["project_dir"] = self.option("project-dir")
             if self.option("gauge-root"):
                 config_dict["gauge_root"] = self.option("gauge-root")
-            
+
             # Create and configure plugin
             plugin = GaugePlugin()
             task = plugin.create_task(config_dict)
-            
+
             # Run validation
             success = task.validate()
-            
+
             if success:
                 self.line("<info>Gauge project validation completed successfully</info>")
                 return 0
             else:
                 self.line("<error>Gauge project validation failed</error>")
                 return 1
-                
+
         except Exception as e:
             self.line(f"<error>Error validating Gauge project: {e}</error>")
             return 1
@@ -142,43 +140,43 @@ class GaugeValidateCommand(PoetryCommand):
 
 class GaugeFormatCommand(PoetryCommand):
     """Command to format Gauge specs through Poetry."""
-    
+
     name = "gauge format"
     description = "Format Gauge specification files"
-    
+
     options = [
         option("specs-dir", None, "Gauge specs directory path", flag=False),
         option("project-dir", None, "Path to gauge project directory", flag=False),
         option("gauge-root", None, "Path to gauge installation root", flag=False),
     ]
-    
+
     def handle(self) -> int:
         """Handle the gauge format command."""
         try:
             # Build configuration from options
             config_dict = {}
-            
+
             if self.option("specs-dir"):
                 config_dict["specs_dir"] = self.option("specs-dir")
             if self.option("project-dir"):
                 config_dict["project_dir"] = self.option("project-dir")
             if self.option("gauge-root"):
                 config_dict["gauge_root"] = self.option("gauge-root")
-            
+
             # Create and configure plugin
             plugin = GaugePlugin()
             task = plugin.create_task(config_dict)
-            
+
             # Run formatting
             success = task.format_specs()
-            
+
             if success:
                 self.line("<info>Gauge specs formatting completed successfully</info>")
                 return 0
             else:
                 self.line("<error>Gauge specs formatting failed</error>")
                 return 1
-                
+
         except Exception as e:
             self.line(f"<error>Error formatting Gauge specs: {e}</error>")
             return 1
@@ -186,44 +184,44 @@ class GaugeFormatCommand(PoetryCommand):
 
 class GaugeInstallCommand(PoetryCommand):
     """Command to install Gauge plugins through Poetry."""
-    
+
     name = "gauge install"
     description = "Install Gauge plugin"
-    
+
     arguments = [
         argument("plugin", "Plugin name to install")
     ]
-    
+
     options = [
         option("version", "v", "Plugin version to install", flag=False),
         option("gauge-root", None, "Path to gauge installation root", flag=False),
     ]
-    
+
     def handle(self) -> int:
         """Handle the gauge install command."""
         try:
             plugin_name = self.argument("plugin")
             version = self.option("version")
-            
+
             # Build configuration from options
             config_dict = {}
             if self.option("gauge-root"):
                 config_dict["gauge_root"] = self.option("gauge-root")
-            
+
             # Create and configure plugin
             plugin = GaugePlugin()
             task = plugin.create_task(config_dict)
-            
+
             # Install the plugin
             success = task.install_plugin(plugin_name, version)
-            
+
             if success:
                 self.line(f"<info>Gauge plugin '{plugin_name}' installed successfully</info>")
                 return 0
             else:
                 self.line(f"<error>Failed to install Gauge plugin '{plugin_name}'</error>")
                 return 1
-                
+
         except Exception as e:
             self.line(f"<error>Error installing Gauge plugin: {e}</error>")
             return 1
@@ -231,12 +229,12 @@ class GaugeInstallCommand(PoetryCommand):
 
 class GaugePoetryPlugin(ApplicationPlugin):
     """Poetry plugin that adds Gauge commands."""
-    
+
     def activate(self, application: Application) -> None:
         """Activate the plugin by registering Gauge commands."""
         if not POETRY_AVAILABLE:
             return
-        
+
         application.command_loader.register_factory("gauge run", lambda: GaugeRunCommand())
         application.command_loader.register_factory("gauge validate", lambda: GaugeValidateCommand())
         application.command_loader.register_factory("gauge format", lambda: GaugeFormatCommand())

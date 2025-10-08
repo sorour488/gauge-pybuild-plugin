@@ -2,12 +2,13 @@
 Test configuration and utilities for Gauge Python Build Plugin tests.
 """
 
-import os
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Generator
+
 import pytest
+
 
 @pytest.fixture
 def temp_dir() -> Generator[Path, None, None]:
@@ -25,7 +26,7 @@ def mock_gauge_project(temp_dir: Path) -> Path:
     # Create specs directory
     specs_dir = temp_dir / "specs"
     specs_dir.mkdir()
-    
+
     # Create a sample spec file
     spec_content = """
 # Sample Specification
@@ -41,19 +42,19 @@ This is a sample specification for testing.
 * Step four
 """
     (specs_dir / "sample.spec").write_text(spec_content)
-    
+
     # Create manifest.json
     manifest_content = """{
   "Language": "python",
   "Plugins": ["html-report", "python"]
 }"""
     (temp_dir / "manifest.json").write_text(manifest_content)
-    
+
     # Create env directory
     env_dir = temp_dir / "env"
     env_dir.mkdir()
     (env_dir / "default.properties").write_text("# Default environment")
-    
+
     return temp_dir
 
 

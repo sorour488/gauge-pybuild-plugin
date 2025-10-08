@@ -18,6 +18,6 @@ __author__ = "Your Name"
 __email__ = "your.email@example.com"
 __license__ = "Apache-2.0"
 
-from .core import GaugeConfig, GaugeTask, GaugePlugin
+from .core import GaugeConfig, GaugePlugin, GaugeTask
 
 __all__ = ["GaugeConfig", "GaugeTask", "GaugePlugin"]

@@ -98,7 +98,7 @@ gauge = "gauge_pybuild_plugin.setuptools_command:GaugeCommand"
 
 # Ruff configuration (modern, fast linter - replaces flake8, isort, black)
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py38"
 
 [tool.ruff.lint]
